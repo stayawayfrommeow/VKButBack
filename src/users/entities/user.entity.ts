@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { PostEntity } from 'src/posts/entities/post.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -11,27 +12,30 @@ export class UserEntity {
   @Column()
   password: string;
 
-  // @Column()
-  // profileImage: string;
+  @Column({ nullable: true })
+  profileImage: string;
 
-  // @Column()
-  // firstName: string;
+  @Column({ nullable: true })
+  firstName: string;
 
-  // @Column()
-  // secondName: string;
+  @Column({ nullable: true })
+  secondName: string;
 
-  // @Column()
-  // age: string;
+  @Column({ nullable: true })
+  age: string;
 
-  // @Column()
-  // city: string;
+  @Column({ nullable: true })
+  city: string;
 
-  // @Column()
-  // university: string;
+  @Column({ nullable: true })
+  university: string;
 
-  // @Column('text', { array: true })
+  // @Column('text', { array: true, nullable: true })
   // postIds: string[];
 
-  // @Column('text', { array: true })
-  // friendIds: string[];
+  @OneToMany(() => PostEntity, (post) => post.author)
+  posts: PostEntity;
+
+  @Column('text', { array: true, nullable: true })
+  friendIds: string[];
 }

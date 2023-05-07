@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +14,15 @@ export class UsersService {
 
   async findByLogin(login: string) {
     return this.repository.findOneBy({ login });
+  }
+
+  async findFriends(search: string) {
+    return this.repository.find({
+      where: {
+        firstName: Like(`%${search}%`),
+        secondName: Like(`%${search}%`),
+      },
+    });
   }
 
   async findById(id: string) {

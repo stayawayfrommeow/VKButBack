@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UserId } from 'src/decorators/userId.decorator';
 
@@ -30,5 +32,28 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getMe(@UserId() id: string) {
     return this.usersService.findById(id);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getFriends(@Param('id') id: string) {
+    const user = await this.usersService.findById(id);
+
+    const friendList = user.friendIds?.map(async (id) => {
+      const fullUser = await this.usersService.findById(id);
+
+      const { profileImage, firstName, secondName } = fullUser;
+
+      return { id, profileImage, firstName, secondName };
+    });
+
+    return friendList ? friendList : null;
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'search' })
+  async findUsers(@Query() query) {
+    return await this.usersService.findFriends(query.search);
   }
 }
