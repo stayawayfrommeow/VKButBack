@@ -13,7 +13,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UserId } from 'src/decorators/userId.decorator';
 
@@ -23,10 +23,11 @@ import { UserId } from 'src/decorators/userId.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
+  @Post()
+  @ApiBody({ type: UpdateUserDto })
+  update(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(updateUserDto);
+  }
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
@@ -54,6 +55,6 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiQuery({ name: 'search' })
   async findUsers(@Query() query) {
-    return await this.usersService.findFriends(query.search);
+    return await this.usersService.findUsers(query.search);
   }
 }

@@ -15,6 +15,13 @@ export class PostsService {
     private userService: UsersService,
   ) {}
 
+  async getPostsById(id: string) {
+    return await this.repository.find({
+      relations: { author: true },
+      where: { author: { id } },
+    });
+  }
+
   async create(dto: CreatePostDto, author: string) {
     const user = await this.userService.findById(author);
 

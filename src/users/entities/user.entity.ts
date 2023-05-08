@@ -1,5 +1,11 @@
 import { PostEntity } from 'src/posts/entities/post.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -33,8 +39,9 @@ export class UserEntity {
   // @Column('text', { array: true, nullable: true })
   // postIds: string[];
 
+  @JoinColumn()
   @OneToMany(() => PostEntity, (post) => post.author)
-  posts: PostEntity;
+  posts: PostEntity[];
 
   @Column('text', { array: true, nullable: true })
   friendIds: string[];
