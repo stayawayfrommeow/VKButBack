@@ -49,4 +49,23 @@ export class UsersService {
       message: 'Successfully updated profile',
     };
   }
+
+  async befriend(friendId: string, myId: string) {
+    await this.repository.update(friendId, {
+      friendIds: [
+        ...(await this.repository.findOneBy({ id: friendId })).friendIds,
+        myId,
+      ],
+    });
+    await this.repository.update(myId, {
+      friendIds: [
+        ...(await this.repository.findOneBy({ id: myId })).friendIds,
+        friendId,
+      ],
+    });
+
+    return {
+      message: 'Successfully added friend',
+    };
+  }
 }

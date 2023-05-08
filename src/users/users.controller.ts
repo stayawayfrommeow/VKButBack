@@ -57,4 +57,20 @@ export class UsersController {
   async findUsers(@Query() query) {
     return await this.usersService.findUsers(query.search);
   }
+
+  @Post('befriend')
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        friendId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  befriend(@Body() body: { friendId: string }, @UserId() myId: string) {
+    return this.usersService.befriend(body.friendId, myId);
+  }
 }

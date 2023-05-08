@@ -43,6 +43,6 @@ export class UserEntity {
   @OneToMany(() => PostEntity, (post) => post.author)
   posts: PostEntity[];
 
-  @Column('text', { array: true, nullable: true })
+  @Column('text', { array: true, nullable: true, default: [] })
   friendIds: string[];
 }
