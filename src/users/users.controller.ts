@@ -37,6 +37,12 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  getUserById(@Param('id') id: string) {
+    return this.usersService.findById(id);
+  }
+
+  @Get('/friends/:id')
+  @UseGuards(JwtAuthGuard)
   async getFriends(@Param('id') id: string) {
     const user = await this.usersService.findById(id);
 
