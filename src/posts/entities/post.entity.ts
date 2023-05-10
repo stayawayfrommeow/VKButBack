@@ -2,6 +2,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -24,6 +25,7 @@ export class PostEntity {
   // @Column()
   // author: UserEntity;
 
+  @JoinColumn()
   @ManyToOne(() => UserEntity, (user) => user.posts)
   author: UserEntity;
 

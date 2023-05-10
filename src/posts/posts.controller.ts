@@ -8,14 +8,16 @@ import {
   Delete,
   UseGuards,
   Logger,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { UserId } from 'src/decorators/userId.decorator';
 import { UsersService } from 'src/users/users.service';
+import { PostEntity } from './entities/post.entity';
 
 @Controller('posts')
 @ApiTags('posts')
@@ -33,7 +35,7 @@ export class PostsController {
     return this.postsService.create(createPostDto, id);
   }
 
-  @Get(':id')
+  @Get('user/:id')
   @UseGuards(JwtAuthGuard)
   async getPosts(@Param('id') id: string) {
     const posts = await this.postsService.getPostsById(id);
@@ -41,15 +43,31 @@ export class PostsController {
     return { posts };
   }
 
-  @Get('feed')
+  @Post('delete/:id')
   @UseGuards(JwtAuthGuard)
-  async getFeed(@UserId() id: string) {
+  async deletePosts(@Param('id') id: string, @UserId() myId: string) {
+    const posts = await this.postsService.deletePostById(id, myId);
+    return { message: 'deleted' };
+  }
+
+  @Post('like/:id')
+  @UseGuards(JwtAuthGuard)
+  async likePost(@Param('id') id: string) {
+    const post = await this.postsService.likePostById(id);
+
+    return { post };
+  }
+
+  @Get('/feed')
+  @UseGuards(JwtAuthGuard)
+  @ApiQuery({ name: 'cursor' })
+  async getFeed(@UserId() id: string, @Query() cursor) {
     const user = await this.usersService.findById(id);
 
-    const feed = user.friendIds.map(async (id) => {
-      return await this.postsService.getPostsById(id);
-    });
+    const arr = user.friendIds;
 
-    return { feed };
+    const arr2 = await this.postsService.getPostsByIds(arr, cursor);
+
+    return arr2.slice(cursor.cursor, cursor.cursor + 15);
   }
 }

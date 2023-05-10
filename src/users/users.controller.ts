@@ -79,4 +79,20 @@ export class UsersController {
   befriend(@Body() body: { friendId: string }, @UserId() myId: string) {
     return this.usersService.befriend(body.friendId, myId);
   }
+
+  @Post('unfriend')
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        friendId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  unfriend(@Body() body: { friendId: string }, @UserId() myId: string) {
+    return this.usersService.unfriend(body.friendId, myId);
+  }
 }

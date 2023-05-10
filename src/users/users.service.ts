@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { ILike, Like, Repository } from 'typeorm';
+import { ILike, In, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -33,7 +33,7 @@ export class UsersService {
   }
 
   async findById(id: string) {
-    return this.repository.findOneBy({ id });
+    return await this.repository.findOneBy({ id });
   }
 
   create(dto: CreateUserDto) {
@@ -64,8 +64,30 @@ export class UsersService {
       ],
     });
 
-    return {
-      message: 'Successfully added friend',
-    };
+    return await this.repository.findOneBy({ id: myId });
   }
+  async unfriend(friendId: string, myId: string) {
+    await this.repository.update(friendId, {
+      friendIds: (
+        await this.repository.findOneBy({ id: friendId })
+      ).friendIds.filter((id) => +id !== +myId),
+    });
+
+    const myNewFriends = (
+      await this.repository.findOneBy({ id: myId })
+    ).friendIds.filter((id) => +id !== +friendId);
+
+    await this.repository.update(myId, {
+      friendIds: myNewFriends,
+    });
+
+    return await this.repository.findOneBy({ id: myId });
+  }
+
+  // async getPostsByIds(ids: string[], cursor: number) {
+  //   return await this.repository.find({
+  //     relations: { posts: true },
+  //     where: { id: In(ids) },
+  //   });
+  // }
 }
